@@ -65,7 +65,7 @@ const props = withDefaults(defineProps<TextareaProps>(), {
 defineSlots<TextareaSlots>()
 const emits = defineEmits<TextareaEmits>()
 
-const [modelValue, modelModifiers] = defineModel<string | number>()
+const [modelValue, modelModifiers] = defineModel<string | number | null>()
 
 const { emitFormFocus, emitFormBlur, emitFormInput, emitFormChange, size, color, id, name, highlight, disabled, ariaAttrs } = useFormField<TextareaProps>(props, { deferInputValidation: true })
 
@@ -85,13 +85,17 @@ function autoFocus() {
 }
 
 // Custom function to handle the v-model properties
-function updateInput(value: string) {
+function updateInput(value: string | null) {
   if (modelModifiers.trim) {
-    value = value.trim()
+    value = value?.trim() ?? null
   }
 
   if (modelModifiers.number) {
     value = looseToNumber(value)
+  }
+
+  if (modelModifiers.nullify) {
+    value ||= null
   }
 
   modelValue.value = value
