@@ -5,7 +5,6 @@ import _appConfig from '#build/app.config'
 import theme from '#build/ui/button'
 import type { LinkProps } from './Link.vue'
 import type { UseComponentIconsProps } from '../composables/useComponentIcons'
-import { extendDevtoolsMeta } from '../composables/extendDevtoolsMeta'
 import { tv } from '../utils/tv'
 import type { AvatarProps } from '../types'
 import type { PartialString } from '../types/utils'
@@ -18,8 +17,17 @@ type ButtonVariants = VariantProps<typeof button>
 
 export interface ButtonProps extends UseComponentIconsProps, Omit<LinkProps, 'raw' | 'custom'> {
   label?: string
+  /**
+   * @defaultValue 'primary'
+   */
   color?: ButtonVariants['color']
+  /**
+   * @defaultValue 'solid'
+   */
   variant?: ButtonVariants['variant']
+  /**
+   * @defaultValue 'md'
+   */
   size?: ButtonVariants['size']
   /** Render the button with equal padding on all sides. */
   square?: boolean
@@ -31,9 +39,6 @@ export interface ButtonProps extends UseComponentIconsProps, Omit<LinkProps, 'ra
   class?: any
   ui?: PartialString<typeof button.slots>
 }
-
-// Injects props to use as default in the devtools playground.
-extendDevtoolsMeta<ButtonProps>({ defaultProps: { label: 'Click me!' } })
 
 export interface ButtonSlots {
   leading(props?: {}): any

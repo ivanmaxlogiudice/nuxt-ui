@@ -56,8 +56,8 @@ const table = tv({ extend: tv(theme), ...(appConfigTable.ui?.table || {}) })
 
 type TableVariants = VariantProps<typeof table>
 
+export type TableRow<T> = Row<T>
 export type TableData = RowData
-
 export type TableColumn<T extends TableData, D = unknown> = ColumnDef<T, D>
 
 export interface TableOptions<T extends TableData> extends Omit<CoreOptions<T>, 'data' | 'columns' | 'getCoreRowModel' | 'state' | 'onStateChange' | 'renderFallbackValue'> {
@@ -82,7 +82,13 @@ export interface TableProps<T extends TableData> extends TableOptions<T> {
   sticky?: boolean
   /** Whether the table should be in loading state. */
   loading?: boolean
+  /**
+   * @defaultValue 'primary'
+   */
   loadingColor?: TableVariants['loadingColor']
+  /**
+   * @defaultValue 'carousel'
+   */
   loadingAnimation?: TableVariants['loadingAnimation']
   /**
    * @link [API Docs](https://tanstack.com/table/v8/docs/api/features/global-filtering#table-options)
@@ -144,6 +150,7 @@ export interface TableProps<T extends TableData> extends TableOptions<T> {
    * @link [Guide](https://tanstack.com/table/v8/docs/guide/column-faceting)
    */
   facetedOptions?: FacetedOptions<T>
+  onSelect?: (row: TableRow<T>, e?: Event) => void
   class?: any
   ui?: Partial<typeof table.slots>
 }
@@ -154,6 +161,7 @@ type DynamicCellSlots<T, K = keyof T> = Record<string, (props: CellContext<T, un
 export type TableSlots<T> = {
   expanded: (props: { row: Row<T> }) => any
   empty: (props?: {}) => any
+  loading: (props?: {}) => any
   caption: (props?: {}) => any
 } & DynamicHeaderSlots<T> & DynamicCellSlots<T>
 
@@ -168,7 +176,7 @@ import { reactiveOmit } from '@vueuse/core'
 import { useLocale } from '../composables/useLocale'
 
 const props = defineProps<TableProps<T>>()
-defineSlots<TableSlots<T>>()
+const slots = defineSlots<TableSlots<T>>()
 
 const { t } = useLocale()
 
@@ -276,6 +284,22 @@ function valueUpdater<T extends Updater<any>>(updaterOrValue: T, ref: Ref) {
   ref.value = typeof updaterOrValue === 'function' ? updaterOrValue(ref.value) : updaterOrValue
 }
 
+function handleRowSelect(row: TableRow<T>, e: Event) {
+  if (!props.onSelect) {
+    return
+  }
+  const target = e.target as HTMLElement
+  const isInteractive = target.closest('button')
+  if (isInteractive) {
+    return
+  }
+
+  e.preventDefault()
+  e.stopPropagation()
+
+  props.onSelect(row, e)
+}
+
 defineExpose({
   tableApi
 })
@@ -308,7 +332,15 @@ defineExpose({
       <tbody :class="ui.tbody({ class: [props.ui?.tbody] })">
         <template v-if="tableApi.getRowModel().rows?.length">
           <template v-for="row in tableApi.getRowModel().rows" :key="row.id">
-            <tr :data-selected="row.getIsSelected()" :data-expanded="row.getIsExpanded()" :class="ui.tr({ class: [props.ui?.tr] })">
+            <tr
+              :data-selected="row.getIsSelected()"
+              :data-selectable="!!props.onSelect"
+              :data-expanded="row.getIsExpanded()"
+              :role="props.onSelect ? 'button' : undefined"
+              :tabindex="props.onSelect ? 0 : undefined"
+              :class="ui.tr({ class: [props.ui?.tr] })"
+              @click="handleRowSelect(row, $event)"
+            >
               <td
                 v-for="cell in row.getVisibleCells()"
                 :key="cell.id"
@@ -328,7 +360,13 @@ defineExpose({
           </template>
         </template>
 
-        <tr v-else :class="ui.tr({ class: [props.ui?.tr] })">
+        <tr v-else-if="loading && !!slots['loading']">
+          <td :colspan="columns?.length" :class="ui.loading({ class: props.ui?.loading })">
+            <slot name="loading" />
+          </td>
+        </tr>
+
+        <tr v-else>
           <td :colspan="columns?.length" :class="ui.empty({ class: props.ui?.empty })">
             <slot name="empty">
               {{ t('table.noData') }}

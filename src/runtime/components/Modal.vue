@@ -3,7 +3,6 @@ import type { DialogRootProps, DialogRootEmits, DialogContentProps } from 'reka-
 import type { AppConfig } from '@nuxt/schema'
 import _appConfig from '#build/app.config'
 import theme from '#build/ui/modal'
-import { extendDevtoolsMeta } from '../composables/extendDevtoolsMeta'
 import { tv } from '../utils/tv'
 import type { ButtonProps } from '../types'
 
@@ -45,6 +44,7 @@ export interface ModalProps extends DialogRootProps {
   /**
    * The icon displayed in the close button.
    * @defaultValue appConfig.ui.icons.close
+   * @IconifyIcon
    */
   closeIcon?: string
   /**
@@ -70,8 +70,6 @@ export interface ModalSlots {
   body(props?: {}): any
   footer(props?: {}): any
 }
-
-extendDevtoolsMeta({ example: 'ModalExample' })
 </script>
 
 <script setup lang="ts">

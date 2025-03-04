@@ -4,7 +4,6 @@ import type { ToastProviderProps } from 'reka-ui'
 import type { AppConfig } from '@nuxt/schema'
 import _appConfig from '#build/app.config'
 import theme from '#build/ui/toaster'
-import { extendDevtoolsMeta } from '../composables/extendDevtoolsMeta'
 import { tv } from '../utils/tv'
 
 const appConfigToaster = _appConfig as AppConfig & { ui: { toaster: Partial<typeof theme> } }
@@ -14,6 +13,10 @@ const toaster = tv({ extend: tv(theme), ...(appConfigToaster.ui?.toaster || {}) 
 type ToasterVariants = VariantProps<typeof toaster>
 
 export interface ToasterProps extends Omit<ToastProviderProps, 'swipeDirection'> {
+  /**
+   * The position on the screen to display the toasts.
+   * @defaultValue 'bottom-right'
+   */
   position?: ToasterVariants['position']
   /**
    * Expand the toasts to show multiple toasts at once.
@@ -36,8 +39,6 @@ export interface ToasterSlots {
 export default {
   name: 'Toaster'
 }
-
-extendDevtoolsMeta({ example: 'ToasterExample' })
 </script>
 
 <script setup lang="ts">

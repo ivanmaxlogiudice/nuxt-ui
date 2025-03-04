@@ -4,7 +4,6 @@ import type { DialogRootProps, DialogRootEmits, DialogContentProps } from 'reka-
 import type { AppConfig } from '@nuxt/schema'
 import _appConfig from '#build/app.config'
 import theme from '#build/ui/slideover'
-import { extendDevtoolsMeta } from '../composables/extendDevtoolsMeta'
 import { tv } from '../utils/tv'
 import type { ButtonProps } from '../types'
 
@@ -29,6 +28,10 @@ export interface SlideoverProps extends DialogRootProps {
    * @defaultValue true
    */
   transition?: boolean
+  /**
+   * The side of the slideover.
+   * @defaultValue 'right'
+   */
   side?: SlideoverVariants['side']
   /**
    * Render the slideover in a portal.
@@ -44,6 +47,7 @@ export interface SlideoverProps extends DialogRootProps {
   /**
    * The icon displayed in the close button.
    * @defaultValue appConfig.ui.icons.close
+   * @IconifyIcon
    */
   closeIcon?: string
   /**
@@ -69,8 +73,6 @@ export interface SlideoverSlots {
   body(props?: {}): any
   footer(props?: {}): any
 }
-
-extendDevtoolsMeta({ example: 'SlideoverExample' })
 </script>
 
 <script setup lang="ts">

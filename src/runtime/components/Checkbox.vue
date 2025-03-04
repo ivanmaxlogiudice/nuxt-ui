@@ -4,7 +4,6 @@ import type { CheckboxRootProps } from 'reka-ui'
 import type { AppConfig } from '@nuxt/schema'
 import _appConfig from '#build/app.config'
 import theme from '#build/ui/checkbox'
-import { extendDevtoolsMeta } from '../composables/extendDevtoolsMeta'
 import { tv } from '../utils/tv'
 
 const appConfigCheckbox = _appConfig as AppConfig & { ui: { checkbox: Partial<typeof theme> } }
@@ -21,16 +20,24 @@ export interface CheckboxProps extends Pick<CheckboxRootProps, 'disabled' | 'req
   as?: any
   label?: string
   description?: string
+  /**
+   * @defaultValue 'primary'
+   */
   color?: CheckboxVariants['color']
+  /**
+   * @defaultValue 'md'
+   */
   size?: CheckboxVariants['size']
   /**
    * The icon displayed when checked.
    * @defaultValue appConfig.ui.icons.check
+   * @IconifyIcon
    */
   icon?: string
   /**
    * The icon displayed when the checkbox is indeterminate.
    * @defaultValue appConfig.ui.icons.minus
+   * @IconifyIcon
    */
   indeterminateIcon?: string
   class?: any
@@ -45,8 +52,6 @@ export interface CheckboxSlots {
   label(props: { label?: string }): any
   description(props: { description?: string }): any
 }
-
-extendDevtoolsMeta({ defaultProps: { label: 'Check me!' } })
 </script>
 
 <script setup lang="ts">
